@@ -280,6 +280,46 @@ func (o UserVersion) DeepCopy() UserVersion {
 	}
 }
 
+type TeamPlusAllKeys struct {
+	Id          TeamID             `codec:"id" json:"id"`
+	Name        string             `codec:"name" json:"name"`
+	Writers     []UserVersion      `codec:"writers" json:"writers"`
+	OnlyReaders []UserVersion      `codec:"onlyReaders" json:"onlyReaders"`
+	PerTeamKeys map[int]PerTeamKey `codec:"perTeamKeys" json:"perTeamKeys"`
+}
+
+func (o TeamPlusAllKeys) DeepCopy() TeamPlusAllKeys {
+	return TeamPlusAllKeys{
+		Id:   o.Id.DeepCopy(),
+		Name: o.Name,
+		Writers: (func(x []UserVersion) []UserVersion {
+			var ret []UserVersion
+			for _, v := range x {
+				vCopy := v.DeepCopy()
+				ret = append(ret, vCopy)
+			}
+			return ret
+		})(o.Writers),
+		OnlyReaders: (func(x []UserVersion) []UserVersion {
+			var ret []UserVersion
+			for _, v := range x {
+				vCopy := v.DeepCopy()
+				ret = append(ret, vCopy)
+			}
+			return ret
+		})(o.OnlyReaders),
+		PerTeamKeys: (func(x map[int]PerTeamKey) map[int]PerTeamKey {
+			ret := make(map[int]PerTeamKey)
+			for k, v := range x {
+				kCopy := k
+				vCopy := v.DeepCopy()
+				ret[kCopy] = vCopy
+			}
+			return ret
+		})(o.PerTeamKeys),
+	}
+}
+
 type TeamSigChainState struct {
 	Reader       UserVersion                    `codec:"reader" json:"reader"`
 	Id           TeamID                         `codec:"id" json:"id"`

@@ -202,20 +202,6 @@ protocol Common {
       array<RemoteTrack> remoteTracks;
   }
   
-  record TeamPlusAllKeys {
-      TeamID id;
-      string name;
-
-      // I believe UID is a type copy of string, teams.avdl uses array<string>, is array<UID> better?
-      // but...Team.members returns strings
-      array<string> writers;
-
-      // optimization todo: remove writers from this and rename to onlyReaders
-      array<string> readers;
-
-      map<int, PerTeamKey> perTeamKeys;
-  }
-
   @go("nostring")
   enum MerkleTreeID {
        MASTER_0,

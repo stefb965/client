@@ -5764,8 +5764,8 @@ export type TeamNameParts = {
 export type TeamPlusAllKeys = {
   id: TeamID,
   name: string,
-  writers?: ?Array<string>,
-  readers?: ?Array<string>,
+  writers?: ?Array<UserVersion>,
+  onlyReaders?: ?Array<UserVersion>,
   perTeamKeys: {[key: string]: PerTeamKey},
 }
 

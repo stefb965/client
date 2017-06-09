@@ -2,6 +2,7 @@ package teams
 
 import (
 	"encoding/json"
+	"strings"
 
 	"golang.org/x/net/context"
 
@@ -14,6 +15,11 @@ func Get(ctx context.Context, g *libkb.GlobalContext, name string) (*Team, error
 	return f.find(ctx, g, name)
 }
 
+func GetFromID(ctx context.Context, g *libkb.GlobalContext, id keybase1.TeamID) (*Team, error) {
+	f := newFinder(g)
+	return f.findFromID(ctx, g, id)
+}
+
 type finder struct {
 	libkb.Contextified
 }
@@ -24,13 +30,8 @@ func newFinder(g *libkb.GlobalContext) *finder {
 	}
 }
 
-func (f *finder) find(ctx context.Context, g *libkb.GlobalContext, name string) (*Team, error) {
-	raw, err := f.rawTeam(ctx, name)
-	if err != nil {
-		return nil, err
-	}
-
-	team := NewTeam(g, name)
+func (f *finder) findFromRaw(ctx context.Context, g *libkb.GlobalContext, raw *rawTeam) (*Team, error) {
+	team := NewTeam(g, strings.Join(raw.Name.Parts, "."))
 	team.Box = raw.Box
 	team.ReaderKeyMasks = raw.ReaderKeyMasks
 
@@ -54,18 +55,54 @@ func (f *finder) find(ctx context.Context, g *libkb.GlobalContext, name string) 
 	return team, nil
 }
 
-func (f *finder) rawTeam(ctx context.Context, name string) (*rawTeam, error) {
+func (f *finder) find(ctx context.Context, g *libkb.GlobalContext, name string) (*Team, error) {
+	raw, err := f.rawTeam(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+	return f.findFromRaw(ctx, g, raw)
+}
+
+func (f *finder) findFromID(ctx context.Context, g *libkb.GlobalContext, id keybase1.TeamID) (*Team, error) {
+	raw, err := f.rawTeamFromID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return f.findFromRaw(ctx, g, raw)
+}
+
+func (f *finder) rawTeamFromArgs(ctx context.Context, args libkb.HTTPArgs) (*rawTeam, error) {
 	arg := libkb.NewRetryAPIArg("team/get")
 	arg.NetContext = ctx
 	arg.SessionType = libkb.APISessionTypeREQUIRED
-	arg.Args = libkb.HTTPArgs{
-		"name": libkb.S{Val: name},
-	}
+	arg.Args = args
 	var rt rawTeam
 	if err := f.G().API.GetDecode(arg, &rt); err != nil {
 		return nil, err
 	}
 	return &rt, nil
+}
+
+func (f *finder) rawTeam(ctx context.Context, name string) (*rawTeam, error) {
+	args := libkb.HTTPArgs{
+		"name": libkb.S{Val: name},
+	}
+	rt, err := f.rawTeamFromArgs(ctx, args)
+	if err != nil {
+		return nil, err
+	}
+	return rt, nil
+}
+
+func (f *finder) rawTeamFromID(ctx context.Context, id keybase1.TeamID) (*rawTeam, error) {
+	args := libkb.HTTPArgs{
+		"id": libkb.S{Val: string(id)},
+	}
+	rt, err := f.rawTeamFromArgs(ctx, args)
+	if err != nil {
+		return nil, err
+	}
+	return rt, nil
 }
 
 func (f *finder) chainLinks(ctx context.Context, rawTeam *rawTeam) ([]SCChainLink, error) {

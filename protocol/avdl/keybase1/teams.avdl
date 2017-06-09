@@ -66,6 +66,16 @@ protocol teams {
     Seqno eldestSeqno;
   }
 
+  record TeamPlusAllKeys {
+      TeamID id;
+      string name;
+
+      array<UserVersion> writers;
+      array<UserVersion> onlyReaders;
+
+      map<int, PerTeamKey> perTeamKeys;
+  }
+
   // State of a parsed team sigchain.
   // Should be treated as immutable when outside TeamSigChainPlayer.
   // Modified internally to TeamSigChainPlayer.

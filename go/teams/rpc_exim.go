@@ -9,32 +9,47 @@ import (
 	keybase1 "github.com/keybase/client/go/protocol/keybase1"
 )
 
-func (t *Team) ExportToTeamPlusAllKeys(idTime keybase1.Time) keybase1.TeamPlusAllKeys {
-	var perTeamKeys = make(map[int]keybase1.PerTeamKey)
-	var err error
-	var i = 0
-	for err == nil {
-		perTeamKeys[i], err = t.Chain.GetPerTeamKeyAtGeneration(i)
-		i++
-	}
-	// hack
-	// for i := 0; i < t.Chain.GetLatestSeqno(); i++ {
-	// 	if err != nil {
-	// 		t.G().Log.Error("error getting perTeamKey: %s", err)
-	// 	}
-	// }
-	var members keybase1.TeamMembers
-	members, err = t.Members()
+func (t *Team) ExportToTeamPlusAllKeys(idTime keybase1.Time) (*keybase1.TeamPlusAllKeys, error) {
+	perTeamKeys := t.Chain.inner.PerTeamKeys
+
+	members, err := t.Members()
 	if err != nil {
-		t.G().Log.Error("error getting members: %s", err)
+		return nil, err
 	}
+
+	writers := make([]keybase1.UserVersion, 0)
+	for _, writerString := range members.Writers {
+		writer, err := ParseUserVersion(writerString)
+		if err != nil {
+			return nil, err
+		}
+		writers = append(writers, writer)
+	}
+
+	writersSet := make(map[keybase1.UserVersion]bool, 0)
+	for _, writer := range writers {
+		writersSet[writer] = true
+	}
+
+	onlyReaders := make([]keybase1.UserVersion, 0)
+	for _, readerString := range members.Readers {
+		reader, err := ParseUserVersion(readerString)
+		if err != nil {
+			return nil, err
+		}
+		_, ok := writersSet[reader]
+		if !ok {
+			onlyReaders = append(onlyReaders, reader)
+		}
+	}
+
 	ret := keybase1.TeamPlusAllKeys{
 		Id:          t.Chain.GetID(),
 		Name:        t.Chain.GetName(),
 		PerTeamKeys: perTeamKeys,
-		Writers:     members.Writers,
-		Readers:     members.Readers, //OPT, remove writers
+		Writers:     writers,
+		OnlyReaders: onlyReaders,
 	}
 
-	return ret
+	return &ret, nil
 }

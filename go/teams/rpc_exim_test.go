@@ -10,15 +10,24 @@ import (
 )
 
 func TestTeamPlusAllKeysExim(t *testing.T) {
-	tc := libkb.SetupTest(t, "team", 1)
+	tc := libkb.SetupTest(t, "TestTeamPlusAllKeysExim", 1)
 	tc.Tp.UpgradePerUserKey = true
-	defer tc.Cleanup()
 	kbtest.CreateAndSignupFakeUser("team", tc.G)
+	defer tc.Cleanup()
+
 	name := createTeam(tc)
 	team, err := Get(context.TODO(), tc.G, name)
-	var exported = team.ExportToTeamPlusAllKeys(keybase1.Time(0))
-	if exported.Name != name {
-		t.Errorf("Got name %s, expected %s", exported.Name, name)
+	if err != nil {
+		t.Fatal(err)
 	}
-	// check rest of PlusAllKeys
+
+	teamFromID, err := GetFromID(context.TODO(), tc.G, team.Chain.GetID())
+
+	exported, err := teamFromID.ExportToTeamPlusAllKeys(keybase1.Time(0))
+	if err != nil {
+		t.Errorf("Error during export: %s", err)
+	}
+	if exported.Name != teamFromID.Name {
+		t.Errorf("Got name %s, expected %s", exported.Name, teamFromID.Name)
+	}
 }

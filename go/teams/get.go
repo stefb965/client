@@ -87,22 +87,14 @@ func (f *finder) rawTeam(ctx context.Context, name string) (*rawTeam, error) {
 	args := libkb.HTTPArgs{
 		"name": libkb.S{Val: name},
 	}
-	rt, err := f.rawTeamFromArgs(ctx, args)
-	if err != nil {
-		return nil, err
-	}
-	return rt, nil
+	return f.rawTeamFromArgs(ctx, args)
 }
 
 func (f *finder) rawTeamFromID(ctx context.Context, id keybase1.TeamID) (*rawTeam, error) {
 	args := libkb.HTTPArgs{
 		"id": libkb.S{Val: string(id)},
 	}
-	rt, err := f.rawTeamFromArgs(ctx, args)
-	if err != nil {
-		return nil, err
-	}
-	return rt, nil
+	return f.rawTeamFromArgs(ctx, args)
 }
 
 func (f *finder) chainLinks(ctx context.Context, rawTeam *rawTeam) ([]SCChainLink, error) {

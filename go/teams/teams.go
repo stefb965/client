@@ -460,7 +460,5 @@ func LoadTeamPlusAllKeys(ctx context.Context, g *libkb.GlobalContext, id keybase
 	if err != nil {
 		return teamPlusAllKeys, err
 	}
-	// TODO; concat net two lines
-	teamPlusAllKeys, err = teamFromID.ExportToTeamPlusAllKeys(keybase1.Time(0))
-	return teamPlusAllKeys, err
+	return teamFromID.ExportToTeamPlusAllKeys(keybase1.Time(0))
 }

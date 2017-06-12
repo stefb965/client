@@ -33,4 +33,10 @@ func TestTeamPlusAllKeysExim(t *testing.T) {
 	if exported.Name != teamFromID.Name {
 		t.Errorf("Got name %s, expected %s", exported.Name, teamFromID.Name)
 	}
+	if exported.Id != teamFromID.Chain.GetID() {
+		t.Errorf("Got id %s, expected %s", exported.Id, teamFromID.Chain.GetID())
+	}
+	if len(exported.PerTeamKeys) != len(teamFromID.Chain.inner.PerTeamKeys) {
+		t.Errorf("Got %s perTeamKeys, expected %s", len(exported.PerTeamKeys), len(teamFromID.Chain.inner.PerTeamKeys))
+	}
 }

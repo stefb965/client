@@ -66,8 +66,8 @@ func (h *TeamsHandler) TeamEditMember(ctx context.Context, arg keybase1.TeamEdit
 	return teams.EditMember(ctx, h.G().ExternalG(), arg.Name, arg.Username, arg.Role)
 }
 
-func (h *TeamsHandler) LoadTeamPlusAllKeys(netCtx context.Context, arg keybase1.LoadUserPlusKeysArg) (keybase1.TeamPlusAllKeys, error) {
+func (h *TeamsHandler) LoadTeamPlusAllKeys(netCtx context.Context, arg keybase1.LoadTeamPlusAllKeysArg) (keybase1.TeamPlusAllKeys, error) {
 	netCtx = libkb.WithLogTag(netCtx, "LTPAK")
 	h.G().Log.CDebugf(netCtx, "+ TeamHandler#LoadTeamPlusAllKeys(%+v)", arg)
-	return teams.LoadTeamPlusAllKeys(netCtx, h.G(), arg.ID)
+	return teams.LoadTeamPlusAllKeys(netCtx, h.G().ExternalG(), arg.Id)
 }

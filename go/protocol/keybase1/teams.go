@@ -498,6 +498,18 @@ func (o TeamEditMemberArg) DeepCopy() TeamEditMemberArg {
 	}
 }
 
+type LoadTeamPlusAllKeysArg struct {
+	SessionID int    `codec:"sessionID" json:"sessionID"`
+	Id        TeamID `codec:"id" json:"id"`
+}
+
+func (o LoadTeamPlusAllKeysArg) DeepCopy() LoadTeamPlusAllKeysArg {
+	return LoadTeamPlusAllKeysArg{
+		SessionID: o.SessionID,
+		Id:        o.Id.DeepCopy(),
+	}
+}
+
 type TeamsInterface interface {
 	TeamCreate(context.Context, TeamCreateArg) error
 	TeamGet(context.Context, TeamGetArg) (TeamMembersUsernames, error)
@@ -505,6 +517,7 @@ type TeamsInterface interface {
 	TeamAddMember(context.Context, TeamAddMemberArg) error
 	TeamRemoveMember(context.Context, TeamRemoveMemberArg) error
 	TeamEditMember(context.Context, TeamEditMemberArg) error
+	LoadTeamPlusAllKeys(context.Context, LoadTeamPlusAllKeysArg) (TeamPlusAllKeys, error)
 }
 
 func TeamsProtocol(i TeamsInterface) rpc.Protocol {
@@ -607,6 +620,22 @@ func TeamsProtocol(i TeamsInterface) rpc.Protocol {
 				},
 				MethodType: rpc.MethodCall,
 			},
+			"loadTeamPlusAllKeys": {
+				MakeArg: func() interface{} {
+					ret := make([]LoadTeamPlusAllKeysArg, 1)
+					return &ret
+				},
+				Handler: func(ctx context.Context, args interface{}) (ret interface{}, err error) {
+					typedArgs, ok := args.(*[]LoadTeamPlusAllKeysArg)
+					if !ok {
+						err = rpc.NewTypeError((*[]LoadTeamPlusAllKeysArg)(nil), args)
+						return
+					}
+					ret, err = i.LoadTeamPlusAllKeys(ctx, (*typedArgs)[0])
+					return
+				},
+				MethodType: rpc.MethodCall,
+			},
 		},
 	}
 }
@@ -642,5 +671,10 @@ func (c TeamsClient) TeamRemoveMember(ctx context.Context, __arg TeamRemoveMembe
 
 func (c TeamsClient) TeamEditMember(ctx context.Context, __arg TeamEditMemberArg) (err error) {
 	err = c.Cli.Call(ctx, "keybase.1.teams.teamEditMember", []interface{}{__arg}, nil)
+	return
+}
+
+func (c TeamsClient) LoadTeamPlusAllKeys(ctx context.Context, __arg LoadTeamPlusAllKeysArg) (res TeamPlusAllKeys, err error) {
+	err = c.Cli.Call(ctx, "keybase.1.teams.loadTeamPlusAllKeys", []interface{}{__arg}, &res)
 	return
 }

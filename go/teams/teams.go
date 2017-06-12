@@ -453,3 +453,14 @@ func (t *Team) postMulti(payload libkb.JSONPayload) error {
 	}
 	return nil
 }
+
+func LoadTeamPlusAllKeys(ctx context.Context, g *libkb.GlobalContext, id keybase1.TeamID) (keybase1.TeamPlusAllKeys, error) {
+	var teamPlusAllKeys keybase1.TeamPlusAllKeys
+	teamFromID, err := GetFromID(ctx, g, id)
+	if err != nil {
+		return teamPlusAllKeys, err
+	}
+	// TODO; concat net two lines
+	teamPlusAllKeys, err = teamFromID.ExportToTeamPlusAllKeys(keybase1.Time(0))
+	return teamPlusAllKeys, err
+}

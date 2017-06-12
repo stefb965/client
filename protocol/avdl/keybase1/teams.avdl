@@ -126,4 +126,5 @@ protocol teams {
   void teamAddMember(int sessionID, string name, string username, TeamRole role, boolean sendChatNotification);
   void teamRemoveMember(int sessionID, string name, string username);
   void teamEditMember(int sessionID, string name, string username, TeamRole role);
+  TeamPlusAllKeys loadTeamPlusAllKeys(int sessionID, TeamID id);
 }

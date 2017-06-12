@@ -9,19 +9,20 @@ import (
 	keybase1 "github.com/keybase/client/go/protocol/keybase1"
 )
 
-func (t *Team) ExportToTeamPlusAllKeys(idTime keybase1.Time) (*keybase1.TeamPlusAllKeys, error) {
+func (t *Team) ExportToTeamPlusAllKeys(idTime keybase1.Time) (keybase1.TeamPlusAllKeys, error) {
+	var teamPlusAllKeys keybase1.TeamPlusAllKeys
 	perTeamKeys := t.Chain.inner.PerTeamKeys
 
 	members, err := t.Members()
 	if err != nil {
-		return nil, err
+		return teamPlusAllKeys, err
 	}
 
 	writers := make([]keybase1.UserVersion, 0)
 	for _, writerString := range members.Writers {
 		writer, err := ParseUserVersion(writerString)
 		if err != nil {
-			return nil, err
+			return teamPlusAllKeys, err
 		}
 		writers = append(writers, writer)
 	}
@@ -35,7 +36,7 @@ func (t *Team) ExportToTeamPlusAllKeys(idTime keybase1.Time) (*keybase1.TeamPlus
 	for _, readerString := range members.Readers {
 		reader, err := ParseUserVersion(readerString)
 		if err != nil {
-			return nil, err
+			return teamPlusAllKeys, err
 		}
 		_, ok := writersSet[reader]
 		if !ok {
@@ -43,7 +44,7 @@ func (t *Team) ExportToTeamPlusAllKeys(idTime keybase1.Time) (*keybase1.TeamPlus
 		}
 	}
 
-	ret := keybase1.TeamPlusAllKeys{
+	teamPlusAllKeys = keybase1.TeamPlusAllKeys{
 		Id:          t.Chain.GetID(),
 		Name:        t.Chain.GetName(),
 		PerTeamKeys: perTeamKeys,
@@ -51,5 +52,5 @@ func (t *Team) ExportToTeamPlusAllKeys(idTime keybase1.Time) (*keybase1.TeamPlus
 		OnlyReaders: onlyReaders,
 	}
 
-	return &ret, nil
+	return teamPlusAllKeys, nil
 }

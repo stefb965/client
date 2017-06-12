@@ -440,6 +440,19 @@
         }
       ],
       "response": null
+    },
+    "loadTeamPlusAllKeys": {
+      "request": [
+        {
+          "name": "sessionID",
+          "type": "int"
+        },
+        {
+          "name": "id",
+          "type": "TeamID"
+        }
+      ],
+      "response": "TeamPlusAllKeys"
     }
   },
   "namespace": "keybase.1"

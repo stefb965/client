@@ -12,7 +12,10 @@ import (
 func TestTeamPlusAllKeysExim(t *testing.T) {
 	tc := libkb.SetupTest(t, "TestTeamPlusAllKeysExim", 1)
 	tc.Tp.UpgradePerUserKey = true
-	kbtest.CreateAndSignupFakeUser("team", tc.G)
+	_, err := kbtest.CreateAndSignupFakeUser("team", tc.G)
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer tc.Cleanup()
 
 	name := createTeam(tc)

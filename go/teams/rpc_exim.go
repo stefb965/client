@@ -19,11 +19,7 @@ func (t *Team) ExportToTeamPlusAllKeys(idTime keybase1.Time) (keybase1.TeamPlusA
 	}
 
 	writers := make([]keybase1.UserVersion, 0)
-	for _, writerString := range members.Writers {
-		writer, err := ParseUserVersion(writerString)
-		if err != nil {
-			return teamPlusAllKeys, err
-		}
+	for _, writer := range members.Writers {
 		writers = append(writers, writer)
 	}
 
@@ -33,11 +29,7 @@ func (t *Team) ExportToTeamPlusAllKeys(idTime keybase1.Time) (keybase1.TeamPlusA
 	}
 
 	onlyReaders := make([]keybase1.UserVersion, 0)
-	for _, readerString := range members.Readers {
-		reader, err := ParseUserVersion(readerString)
-		if err != nil {
-			return teamPlusAllKeys, err
-		}
+	for _, reader := range members.Readers {
 		_, ok := writersSet[reader]
 		if !ok {
 			onlyReaders = append(onlyReaders, reader)

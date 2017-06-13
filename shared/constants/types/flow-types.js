@@ -134,6 +134,7 @@ export const ConstantsStatusCode = {
   scbadinvitationcode: 707,
   scmissingresult: 801,
   sckeynotfound: 901,
+  sckeycorrupted: 905,
   sckeyinuse: 907,
   sckeybadgen: 913,
   sckeynosecret: 914,
@@ -4743,6 +4744,8 @@ export type KeybaseTime = {
   chain: int,
 }
 
+export type LeaseID = string
+
 export type LinkCheckResult = {
   proofId: int,
   proofResult: ProofResult,
@@ -4846,6 +4849,7 @@ export type NotificationChannels = {
   kbfsrequest: boolean,
   badges: boolean,
   reachability: boolean,
+  team: boolean,
 }
 
 export type NotifyBadgesBadgeStateRpcParam = Exact<{
@@ -4900,6 +4904,11 @@ export type NotifySessionClientOutOfDateRpcParam = Exact<{
 
 export type NotifySessionLoggedInRpcParam = Exact<{
   username: string
+}>
+
+export type NotifyTeamTeamKeyRotatedRpcParam = Exact<{
+  teamID: TeamID,
+  teamName: string
 }>
 
 export type NotifyTrackingTrackingChangedRpcParam = Exact<{
@@ -5635,6 +5644,7 @@ export type StatusCode =
   | 707 // SCBadInvitationCode_707
   | 801 // SCMissingResult_801
   | 901 // SCKeyNotFound_901
+  | 905 // SCKeyCorrupted_905
   | 907 // SCKeyInUse_907
   | 913 // SCKeyBadGen_913
   | 914 // SCKeyNoSecret_914
@@ -5748,6 +5758,12 @@ export type TeamApplicationKey = {
   key: Bytes32,
 }
 
+export type TeamCLKRMsg = {
+  teamID: TeamID,
+  generation: int,
+  score: int,
+}
+
 export type TeamChangeReq = {
   owners?: ?Array<UID>,
   admins?: ?Array<UID>,
@@ -5757,6 +5773,12 @@ export type TeamChangeReq = {
 }
 
 export type TeamID = string
+
+export type TeamMember = {
+  uid: UID,
+  role: TeamRole,
+  eldestSeqno: Seqno,
+}
 
 export type TeamMembers = {
   owners?: ?Array<UserVersion>,
@@ -7759,6 +7781,13 @@ export type incomingCallMapType = Exact<{
       upgradeTo: string,
       upgradeURI: string,
       upgradeMsg: string
+    }>,
+    response: CommonResponseHandler
+  ) => void,
+  'keybase.1.NotifyTeam.teamKeyRotated'?: (
+    params: Exact<{
+      teamID: TeamID,
+      teamName: string
     }>,
     response: CommonResponseHandler
   ) => void,

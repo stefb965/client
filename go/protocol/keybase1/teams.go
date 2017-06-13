@@ -127,6 +127,20 @@ func (o PerTeamKey) DeepCopy() PerTeamKey {
 	}
 }
 
+type TeamMember struct {
+	Uid         UID      `codec:"uid" json:"uid"`
+	Role        TeamRole `codec:"role" json:"role"`
+	EldestSeqno Seqno    `codec:"eldestSeqno" json:"eldestSeqno"`
+}
+
+func (o TeamMember) DeepCopy() TeamMember {
+	return TeamMember{
+		Uid:         o.Uid.DeepCopy(),
+		Role:        o.Role.DeepCopy(),
+		EldestSeqno: o.EldestSeqno.DeepCopy(),
+	}
+}
+
 type TeamMembers struct {
 	Owners  []UserVersion `codec:"owners" json:"owners"`
 	Admins  []UserVersion `codec:"admins" json:"admins"`
@@ -410,6 +424,20 @@ func (o TeamNameParts) DeepCopy() TeamNameParts {
 			}
 			return ret
 		})(o.Parts),
+	}
+}
+
+type TeamCLKRMsg struct {
+	TeamID     TeamID `codec:"teamID" json:"team_id"`
+	Generation int    `codec:"generation" json:"generation"`
+	Score      int    `codec:"score" json:"score"`
+}
+
+func (o TeamCLKRMsg) DeepCopy() TeamCLKRMsg {
+	return TeamCLKRMsg{
+		TeamID:     o.TeamID.DeepCopy(),
+		Generation: o.Generation,
+		Score:      o.Score,
 	}
 }
 

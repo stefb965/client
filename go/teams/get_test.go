@@ -27,28 +27,6 @@ func TestTeamGet(t *testing.T) {
 	}
 }
 
-func TestGetFromID(t *testing.T) {
-	tc := libkb.SetupTest(t, "team", 1)
-	tc.Tp.UpgradePerUserKey = true
-	kbtest.CreateAndSignupFakeUser("team", tc.G)
-	defer tc.Cleanup()
-
-	name := createTeam(tc)
-	team, err := Get(context.TODO(), tc.G, name)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	teamFromID, err := GetFromID(context.TODO(), tc.G, team.Chain.GetID())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if teamFromID.Name != team.Name {
-		t.Errorf("received team name: %s, expected %d", teamFromID.Name, team.Name)
-	}
-}
-
 func TestTeamApplicationKey(t *testing.T) {
 	tc := libkb.SetupTest(t, "team", 1)
 	tc.Tp.UpgradePerUserKey = true

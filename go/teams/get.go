@@ -2,7 +2,6 @@ package teams
 
 import (
 	"encoding/json"
-	"strings"
 
 	"golang.org/x/net/context"
 

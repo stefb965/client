@@ -9,8 +9,8 @@ import (
 	"github.com/keybase/client/go/protocol/keybase1"
 )
 
-func TestTeamPlusAllKeysExim(t *testing.T) {
-	tc := libkb.SetupTest(t, "TestTeamPlusAllKeysExim", 1)
+func TestTeamPlusApplicationKeysExim(t *testing.T) {
+	tc := libkb.SetupTest(t, "TestTeamPlusApplicationKeysExim", 1)
 	tc.Tp.UpgradePerUserKey = true
 	_, err := kbtest.CreateAndSignupFakeUser("team", tc.G)
 	if err != nil {
@@ -24,19 +24,21 @@ func TestTeamPlusAllKeysExim(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	teamFromID, err := GetFromID(context.TODO(), tc.G, team.Chain.GetID())
-
-	exported, err := teamFromID.ExportToTeamPlusAllKeys(keybase1.Time(0))
+	exported, err := team.ExportToTeamPlusApplicationKeys(context.TODO(), keybase1.Time(0), keybase1.TeamApplication_KBFS)
 	if err != nil {
 		t.Errorf("Error during export: %s", err)
 	}
-	if exported.Name != teamFromID.Name {
-		t.Errorf("Got name %s, expected %s", exported.Name, teamFromID.Name)
+	if exported.Name != team.Name {
+		t.Errorf("Got name %s, expected %s", exported.Name, team.Name)
 	}
-	if exported.Id != teamFromID.Chain.GetID() {
-		t.Errorf("Got id %s, expected %s", exported.Id, teamFromID.Chain.GetID())
+	if exported.Id != team.Chain.GetID() {
+		t.Errorf("Got id %s, expected %s", exported.Id, team.Chain.GetID())
 	}
-	if len(exported.PerTeamKeys) != len(teamFromID.Chain.inner.PerTeamKeys) {
-		t.Errorf("Got %s perTeamKeys, expected %s", len(exported.PerTeamKeys), len(teamFromID.Chain.inner.PerTeamKeys))
+	expectedKeys, err := team.AllApplicationKeys(context.TODO(), keybase1.TeamApplication_KBFS)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(exported.ApplicationKeys) != len(expectedKeys) {
+		t.Errorf("Got %s applicationKeys, expected %s", len(exported.ApplicationKeys), len(expectedKeys))
 	}
 }

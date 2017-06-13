@@ -280,18 +280,20 @@ func (o UserVersion) DeepCopy() UserVersion {
 	}
 }
 
-type TeamPlusAllKeys struct {
-	Id          TeamID             `codec:"id" json:"id"`
-	Name        string             `codec:"name" json:"name"`
-	Writers     []UserVersion      `codec:"writers" json:"writers"`
-	OnlyReaders []UserVersion      `codec:"onlyReaders" json:"onlyReaders"`
-	PerTeamKeys map[int]PerTeamKey `codec:"perTeamKeys" json:"perTeamKeys"`
+type TeamPlusApplicationKeys struct {
+	Id              TeamID               `codec:"id" json:"id"`
+	Name            string               `codec:"name" json:"name"`
+	Application     TeamApplication      `codec:"application" json:"application"`
+	Writers         []UserVersion        `codec:"writers" json:"writers"`
+	OnlyReaders     []UserVersion        `codec:"onlyReaders" json:"onlyReaders"`
+	ApplicationKeys []TeamApplicationKey `codec:"applicationKeys" json:"applicationKeys"`
 }
 
-func (o TeamPlusAllKeys) DeepCopy() TeamPlusAllKeys {
-	return TeamPlusAllKeys{
-		Id:   o.Id.DeepCopy(),
-		Name: o.Name,
+func (o TeamPlusApplicationKeys) DeepCopy() TeamPlusApplicationKeys {
+	return TeamPlusApplicationKeys{
+		Id:          o.Id.DeepCopy(),
+		Name:        o.Name,
+		Application: o.Application.DeepCopy(),
 		Writers: (func(x []UserVersion) []UserVersion {
 			var ret []UserVersion
 			for _, v := range x {
@@ -308,15 +310,14 @@ func (o TeamPlusAllKeys) DeepCopy() TeamPlusAllKeys {
 			}
 			return ret
 		})(o.OnlyReaders),
-		PerTeamKeys: (func(x map[int]PerTeamKey) map[int]PerTeamKey {
-			ret := make(map[int]PerTeamKey)
-			for k, v := range x {
-				kCopy := k
+		ApplicationKeys: (func(x []TeamApplicationKey) []TeamApplicationKey {
+			var ret []TeamApplicationKey
+			for _, v := range x {
 				vCopy := v.DeepCopy()
-				ret[kCopy] = vCopy
+				ret = append(ret, vCopy)
 			}
 			return ret
-		})(o.PerTeamKeys),
+		})(o.ApplicationKeys),
 	}
 }
 
@@ -498,15 +499,17 @@ func (o TeamEditMemberArg) DeepCopy() TeamEditMemberArg {
 	}
 }
 
-type LoadTeamPlusAllKeysArg struct {
-	SessionID int    `codec:"sessionID" json:"sessionID"`
-	Id        TeamID `codec:"id" json:"id"`
+type LoadTeamPlusApplicationKeysArg struct {
+	SessionID   int             `codec:"sessionID" json:"sessionID"`
+	Id          TeamID          `codec:"id" json:"id"`
+	Application TeamApplication `codec:"application" json:"application"`
 }
 
-func (o LoadTeamPlusAllKeysArg) DeepCopy() LoadTeamPlusAllKeysArg {
-	return LoadTeamPlusAllKeysArg{
-		SessionID: o.SessionID,
-		Id:        o.Id.DeepCopy(),
+func (o LoadTeamPlusApplicationKeysArg) DeepCopy() LoadTeamPlusApplicationKeysArg {
+	return LoadTeamPlusApplicationKeysArg{
+		SessionID:   o.SessionID,
+		Id:          o.Id.DeepCopy(),
+		Application: o.Application.DeepCopy(),
 	}
 }
 
@@ -517,7 +520,7 @@ type TeamsInterface interface {
 	TeamAddMember(context.Context, TeamAddMemberArg) error
 	TeamRemoveMember(context.Context, TeamRemoveMemberArg) error
 	TeamEditMember(context.Context, TeamEditMemberArg) error
-	LoadTeamPlusAllKeys(context.Context, LoadTeamPlusAllKeysArg) (TeamPlusAllKeys, error)
+	LoadTeamPlusApplicationKeys(context.Context, LoadTeamPlusApplicationKeysArg) (TeamPlusApplicationKeys, error)
 }
 
 func TeamsProtocol(i TeamsInterface) rpc.Protocol {
@@ -620,18 +623,18 @@ func TeamsProtocol(i TeamsInterface) rpc.Protocol {
 				},
 				MethodType: rpc.MethodCall,
 			},
-			"loadTeamPlusAllKeys": {
+			"loadTeamPlusApplicationKeys": {
 				MakeArg: func() interface{} {
-					ret := make([]LoadTeamPlusAllKeysArg, 1)
+					ret := make([]LoadTeamPlusApplicationKeysArg, 1)
 					return &ret
 				},
 				Handler: func(ctx context.Context, args interface{}) (ret interface{}, err error) {
-					typedArgs, ok := args.(*[]LoadTeamPlusAllKeysArg)
+					typedArgs, ok := args.(*[]LoadTeamPlusApplicationKeysArg)
 					if !ok {
-						err = rpc.NewTypeError((*[]LoadTeamPlusAllKeysArg)(nil), args)
+						err = rpc.NewTypeError((*[]LoadTeamPlusApplicationKeysArg)(nil), args)
 						return
 					}
-					ret, err = i.LoadTeamPlusAllKeys(ctx, (*typedArgs)[0])
+					ret, err = i.LoadTeamPlusApplicationKeys(ctx, (*typedArgs)[0])
 					return
 				},
 				MethodType: rpc.MethodCall,
@@ -674,7 +677,7 @@ func (c TeamsClient) TeamEditMember(ctx context.Context, __arg TeamEditMemberArg
 	return
 }
 
-func (c TeamsClient) LoadTeamPlusAllKeys(ctx context.Context, __arg LoadTeamPlusAllKeysArg) (res TeamPlusAllKeys, err error) {
-	err = c.Cli.Call(ctx, "keybase.1.teams.loadTeamPlusAllKeys", []interface{}{__arg}, &res)
+func (c TeamsClient) LoadTeamPlusApplicationKeys(ctx context.Context, __arg LoadTeamPlusApplicationKeysArg) (res TeamPlusApplicationKeys, err error) {
+	err = c.Cli.Call(ctx, "keybase.1.teams.loadTeamPlusApplicationKeys", []interface{}{__arg}, &res)
 	return
 }

@@ -3497,19 +3497,19 @@ export function sigsSigListRpcPromise (request: $Exact<requestCommon & {callback
   return new Promise((resolve, reject) => engineRpcOutgoing('keybase.1.sigs.sigList', request, (error, result) => error ? reject(error) : resolve(result)))
 }
 
-export function teamsLoadTeamPlusAllKeysRpc (request: Exact<requestCommon & {callback?: ?(err: ?any, response: teamsLoadTeamPlusAllKeysResult) => void} & {param: teamsLoadTeamPlusAllKeysRpcParam}>) {
-  engineRpcOutgoing('keybase.1.teams.loadTeamPlusAllKeys', request)
+export function teamsLoadTeamPlusApplicationKeysRpc (request: Exact<requestCommon & {callback?: ?(err: ?any, response: teamsLoadTeamPlusApplicationKeysResult) => void} & {param: teamsLoadTeamPlusApplicationKeysRpcParam}>) {
+  engineRpcOutgoing('keybase.1.teams.loadTeamPlusApplicationKeys', request)
 }
 
-export function teamsLoadTeamPlusAllKeysRpcChannelMap (configKeys: Array<string>, request: $Exact<requestCommon & {callback?: ?(err: ?any, response: teamsLoadTeamPlusAllKeysResult) => void} & {param: teamsLoadTeamPlusAllKeysRpcParam}>): EngineChannel {
-  return engine()._channelMapRpcHelper(configKeys, 'keybase.1.teams.loadTeamPlusAllKeys', request)
+export function teamsLoadTeamPlusApplicationKeysRpcChannelMap (configKeys: Array<string>, request: $Exact<requestCommon & {callback?: ?(err: ?any, response: teamsLoadTeamPlusApplicationKeysResult) => void} & {param: teamsLoadTeamPlusApplicationKeysRpcParam}>): EngineChannel {
+  return engine()._channelMapRpcHelper(configKeys, 'keybase.1.teams.loadTeamPlusApplicationKeys', request)
 }
-export function teamsLoadTeamPlusAllKeysRpcChannelMapOld (channelConfig: ChannelConfig<*>, request: $Exact<requestCommon & {callback?: ?(err: ?any, response: teamsLoadTeamPlusAllKeysResult) => void} & {param: teamsLoadTeamPlusAllKeysRpcParam}>): ChannelMap<*> {
-  return _channelMapRpcHelper(channelConfig, (incomingCallMap, callback) => { engineRpcOutgoing('keybase.1.teams.loadTeamPlusAllKeys', request, callback, incomingCallMap) })
+export function teamsLoadTeamPlusApplicationKeysRpcChannelMapOld (channelConfig: ChannelConfig<*>, request: $Exact<requestCommon & {callback?: ?(err: ?any, response: teamsLoadTeamPlusApplicationKeysResult) => void} & {param: teamsLoadTeamPlusApplicationKeysRpcParam}>): ChannelMap<*> {
+  return _channelMapRpcHelper(channelConfig, (incomingCallMap, callback) => { engineRpcOutgoing('keybase.1.teams.loadTeamPlusApplicationKeys', request, callback, incomingCallMap) })
 }
 
-export function teamsLoadTeamPlusAllKeysRpcPromise (request: $Exact<requestCommon & {callback?: ?(err: ?any, response: teamsLoadTeamPlusAllKeysResult) => void} & {param: teamsLoadTeamPlusAllKeysRpcParam}>): Promise<teamsLoadTeamPlusAllKeysResult> {
-  return new Promise((resolve, reject) => engineRpcOutgoing('keybase.1.teams.loadTeamPlusAllKeys', request, (error, result) => error ? reject(error) : resolve(result)))
+export function teamsLoadTeamPlusApplicationKeysRpcPromise (request: $Exact<requestCommon & {callback?: ?(err: ?any, response: teamsLoadTeamPlusApplicationKeysResult) => void} & {param: teamsLoadTeamPlusApplicationKeysRpcParam}>): Promise<teamsLoadTeamPlusApplicationKeysResult> {
+  return new Promise((resolve, reject) => engineRpcOutgoing('keybase.1.teams.loadTeamPlusApplicationKeys', request, (error, result) => error ? reject(error) : resolve(result)))
 }
 
 export function teamsTeamAddMemberRpc (request: Exact<requestCommon & requestErrorCallback & {param: teamsTeamAddMemberRpcParam}>) {
@@ -5776,12 +5776,13 @@ export type TeamNameParts = {
   parts?: ?Array<string>,
 }
 
-export type TeamPlusAllKeys = {
+export type TeamPlusApplicationKeys = {
   id: TeamID,
   name: string,
+  application: TeamApplication,
   writers?: ?Array<UserVersion>,
   onlyReaders?: ?Array<UserVersion>,
-  perTeamKeys: {[key: string]: PerTeamKey},
+  applicationKeys?: ?Array<TeamApplicationKey>,
 }
 
 export type TeamRole =
@@ -6900,8 +6901,9 @@ export type streamUiWriteRpcParam = Exact<{
   buf: bytes
 }>
 
-export type teamsLoadTeamPlusAllKeysRpcParam = Exact<{
-  id: TeamID
+export type teamsLoadTeamPlusApplicationKeysRpcParam = Exact<{
+  id: TeamID,
+  application: TeamApplication
 }>
 
 export type teamsTeamAddMemberRpcParam = Exact<{
@@ -7172,7 +7174,7 @@ type sigsSigListJSONResult = string
 type sigsSigListResult = ?Array<Sig>
 type streamUiReadResult = bytes
 type streamUiWriteResult = int
-type teamsLoadTeamPlusAllKeysResult = TeamPlusAllKeys
+type teamsLoadTeamPlusApplicationKeysResult = TeamPlusApplicationKeys
 type teamsTeamGetResult = TeamMembersUsernames
 type testTestCallbackResult = string
 type testTestResult = Test
@@ -7397,7 +7399,7 @@ export type rpc =
   | signupSignupRpc
   | sigsSigListJSONRpc
   | sigsSigListRpc
-  | teamsLoadTeamPlusAllKeysRpc
+  | teamsLoadTeamPlusApplicationKeysRpc
   | teamsTeamAddMemberRpc
   | teamsTeamChangeMembershipRpc
   | teamsTeamCreateRpc

@@ -454,11 +454,11 @@ func (t *Team) postMulti(payload libkb.JSONPayload) error {
 	return nil
 }
 
-func LoadTeamPlusAllKeys(ctx context.Context, g *libkb.GlobalContext, id keybase1.TeamID) (keybase1.TeamPlusAllKeys, error) {
-	var teamPlusAllKeys keybase1.TeamPlusAllKeys
+func LoadTeamPlusApplicationKeys(ctx context.Context, g *libkb.GlobalContext, id keybase1.TeamID, application keybase1.TeamApplication) (keybase1.TeamPlusApplicationKeys, error) {
+	var teamPlusApplicationKeys keybase1.TeamPlusApplicationKeys
 	teamFromID, err := GetFromID(ctx, g, id)
 	if err != nil {
-		return teamPlusAllKeys, err
+		return teamPlusApplicationKeys, err
 	}
-	return teamFromID.ExportToTeamPlusAllKeys(keybase1.Time(0))
+	return teamFromID.ExportToTeamPlusApplicationKeys(ctx, keybase1.Time(0), application)
 }

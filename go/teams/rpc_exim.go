@@ -6,16 +6,20 @@
 package teams
 
 import (
+	"golang.org/x/net/context"
+
 	keybase1 "github.com/keybase/client/go/protocol/keybase1"
 )
 
-func (t *Team) ExportToTeamPlusAllKeys(idTime keybase1.Time) (keybase1.TeamPlusAllKeys, error) {
-	var teamPlusAllKeys keybase1.TeamPlusAllKeys
-	perTeamKeys := t.Chain.inner.PerTeamKeys
+func (t *Team) ExportToTeamPlusApplicationKeys(ctx context.Context, idTime keybase1.Time, application keybase1.TeamApplication) (teamPlusApplicationKeys keybase1.TeamPlusApplicationKeys, err error) {
+	applicationKeys, err := t.AllApplicationKeys(ctx, application)
+	if err != nil {
+		return
+	}
 
 	members, err := t.Members()
 	if err != nil {
-		return teamPlusAllKeys, err
+		return
 	}
 
 	writers := make([]keybase1.UserVersion, 0)
@@ -36,13 +40,14 @@ func (t *Team) ExportToTeamPlusAllKeys(idTime keybase1.Time) (keybase1.TeamPlusA
 		}
 	}
 
-	teamPlusAllKeys = keybase1.TeamPlusAllKeys{
-		Id:          t.Chain.GetID(),
-		Name:        t.Chain.GetName(),
-		PerTeamKeys: perTeamKeys,
-		Writers:     writers,
-		OnlyReaders: onlyReaders,
+	teamPlusApplicationKeys = keybase1.TeamPlusApplicationKeys{
+		Id:              t.Chain.GetID(),
+		Name:            t.Chain.GetName(),
+		Application:     application,
+		Writers:         writers,
+		OnlyReaders:     onlyReaders,
+		ApplicationKeys: applicationKeys,
 	}
 
-	return teamPlusAllKeys, nil
+	return
 }
